@@ -1,7 +1,7 @@
 from PIL import Image
 
-input_image = r""  # Replace with your image file
-output_image = "output.ppm"  
-
-img = Image.open(input_image)
-img.save(output_image, format="PPM")
+def convert_image_to_ppm(input_image, output_image):
+    img = Image.open(input_image)
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+    img.save(output_image, format="PPM")
