@@ -7,7 +7,7 @@ def convert_to_ppm(input_path, output_path):
             print(f"Error: Input file {input_path} does not exist")
             return False
         img = Image.open(input_path)
-        img = img.convert('L')
+        img = img.convert('RGB')
         img.save(output_path, format='PPM', binary=True)
         if os.path.exists(output_path):
             print(f"Successfully converted {input_path} to {output_path}")
