@@ -1,69 +1,48 @@
+import os
 import numpy as np
+from PIL import Image
 
-def read_ppm_to_grayscale(file_path):
+def extract_and_save_rgb_matrix(ppm_path, output_txt_path="output_matrix.txt"):
     try:
-        with open(file_path, 'rb') as f:
-            header_lines = []
-            while len(header_lines) < 3:
-                line = f.readline().strip()
-                if not line or line.startswith(b'#'):
-                    continue
-                header_lines.append(line.decode('ascii'))
-            
-            print("Parsed header lines:", header_lines)
-            
-            if not header_lines or header_lines[0] != 'P6':
-                raise ValueError("Invalid PPM file: Expected P6 format")
-            if len(header_lines) < 3:
-                raise ValueError(f"Invalid PPM header: Expected 3 lines, got {len(header_lines)}")
-            
-            try:
-                width, height = map(int, header_lines[1].split())
-                maxval = int(header_lines[2])
-            except (ValueError, IndexError) as e:
-                raise ValueError(f"Invalid PPM header: Unable to parse width/height or maxval: {e}")
-            
-            if maxval != 255:
-                raise ValueError(f"Only maxval 255 is supported, got {maxval}")
-            
-            pixel_data = f.read()
-            expected_size = width * height * 3
-            print(f"Pixel data size: {len(pixel_data)} bytes, expected: {expected_size} bytes")
-            if len(pixel_data) != expected_size:
-                raise ValueError(f"Pixel data size ({len(pixel_data)}) does not match expected ({expected_size})")
-            
-            img_array = np.frombuffer(pixel_data, dtype=np.uint8).reshape(height, width, 3)
-            print("RGB array shape:", img_array.shape)
-            
-            grayscale = (
-                0.299 * img_array[:, :, 0] + 
-                0.587 * img_array[:, :, 1] + 
-                0.114 * img_array[:, :, 2]   
-            ).astype(np.float32)
-            print("Grayscale 2D shape:", grayscale.shape)
-            
-            grayscale = grayscale[:, :, np.newaxis] / 255.0
-            print("Final grayscale 3D shape:", grayscale.shape)
-            
-            return grayscale, width, height
+        if not os.path.exists(ppm_path):
+            print(f"Error: PPM file {ppm_path} does not exist")
+            return False
+        if not ppm_path.lower().endswith('.ppm'):
+            print(f"Error: File {ppm_path} is not a PPM file")
+            return False
+        
+        img = Image.open(ppm_path).convert('RGB')
+        
+        if img.size != (100, 100):
+            print(f"Error: Image {ppm_path} is {img.size}, expected (100, 100)")
+            return False
+        
+        img_array = np.array(img) / 255.0
+        
+        if img_array.shape != (100, 100, 3):
+            print(f"Error: Unexpected shape {img_array.shape} for {ppm_path}")
+            return False
+        
+        with open(output_txt_path, 'w') as f:
+            f.write("100x100x3 RGB Matrix (normalized to [0, 1])\n")
+            for i in range(100):
+                for j in range(100):
+                    r, g, b = img_array[i, j]
+                    f.write(f"Pixel ({i}, {j}): [{r:.6f}, {g:.6f}, {b:.6f}]\n")
+        
+        print(f"Successfully saved RGB matrix from {ppm_path} to {output_txt_path}")
+        return True
+    
     except Exception as e:
-        print(f"Error in read_ppm_to_grayscale: {e}")
-        raise
+        print(f"Error processing {ppm_path}: {str(e)}")
+        return False
 
-file_path = r""
-output_text_file = r""
-dimensions_file = r""
-
-try:
-    img_matrix, width, height = read_ppm_to_grayscale(file_path)
-    print("Grayscale matrix shape:", img_matrix.shape)
+if __name__ == "__main__":
+    ppm_path = r""
+    output_txt_path = "output_matrix.txt"
+    success = extract_and_save_rgb_matrix(ppm_path, output_txt_path)
     
-    np.savetxt(output_text_file, img_matrix[:, :, 0], fmt='%.6f')
-    print(f"Matrix saved to {output_text_file}")
-    
-    with open(dimensions_file, 'w') as f:
-        f.write(f"{width} {height}")
-    print(f"Dimensions saved to {dimensions_file}")
-    
-except Exception as e:
-    print(f"Error: {e}")
+    if success:
+        print(f"Matrix saved to {output_txt_path}")
+    else:
+        print("Failed to extract and save matrix")
