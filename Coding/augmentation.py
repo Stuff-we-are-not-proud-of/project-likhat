@@ -23,7 +23,7 @@ albumentation_pipeline = A.Compose([
     ),
 ])
 
-def augment_image(image, num_augments=5):
+def augment_image(image, num_augments=5):       #augmenting
     image = image.convert("L")
     np_img = np.array(image)
 
