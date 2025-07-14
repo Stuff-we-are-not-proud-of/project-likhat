@@ -63,7 +63,8 @@ def conv_forward(rgb_matrix, filters, biases, stride=1,padding=1):
                     
                     Z[i, j, f] = np.sum(region * filt) + bias
                 else:
-                    pass    
+                    pass 
+    Z=np.maximum(0,Z)   
     return Z
 
 if __name__ == "__main__":
