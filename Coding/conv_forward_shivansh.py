@@ -14,25 +14,16 @@ def extract_rgb_matrix(ppm_path):
     
     return img_array
 
-
-
-
 def pad(X):
 
     X_pad = np.pad(X,((1,1),(1,1),(0,0)),mode='constant',constant_values=(0,0))
     
     return X_pad
 
-
-
-
 def initialize_conv_layer(num_filters, filter_size, in_channels):
     filters = np.random.randn(num_filters, filter_size, filter_size, in_channels) * np.sqrt(2. / (filter_size * filter_size * in_channels))   #He initialization
     biases = np.zeros(num_filters)
     return filters, biases
-
-
-
 
 def conv_forward(rgb_matrix, filters, biases, stride=1,padding=1):
     """
@@ -73,7 +64,3 @@ if __name__ == "__main__":
     filters,biases= initialize_conv_layer(32,3,3)
     Z=conv_forward(rgb_matrix,filters,biases)
     print(Z.shape)
-
-
-
-
