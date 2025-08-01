@@ -1,4 +1,3 @@
-import os
 import numpy as np
 from ppm_to_matrix import ppm_to_matrix 
 
