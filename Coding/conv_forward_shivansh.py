@@ -1,18 +1,7 @@
 import numpy as np
 from PIL import Image
+from ppm_to_matrix_shivansh import extract_rgb_matrix
 
-def extract_rgb_matrix(ppm_path):
-    img = Image.open(ppm_path).convert('RGB')
-
-    if img.size != (100, 100):
-        raise ValueError(f"Image size is {img.size}, expected (100, 100).")
-    
-    img_array = np.array(img, dtype=np.float32) / 255.0
-
-    if img_array.shape != (100, 100, 3):
-        raise ValueError(f"Unexpected shape {img_array.shape}.")
-    
-    return img_array
 
 def pad(X):
 
@@ -25,7 +14,7 @@ def initialize_conv_layer(num_filters, filter_size, in_channels):
     biases = np.zeros(num_filters)
     return filters, biases
 
-def conv_forward(rgb_matrix, filters, biases, stride=1,padding=1):
+def conv_forward(image_path, filters, biases, stride=1,padding=1):
     """
     input_image: np.array of shape (H_in, W_in, C_in)
     filters: np.array of shape (num_filters, filter_height, filter_width, C_in)
@@ -35,6 +24,7 @@ def conv_forward(rgb_matrix, filters, biases, stride=1,padding=1):
     Returns: output of shape (H_out, W_out, num_filters)
     """
     
+    rgb_matrix=extract_rgb_matrix(image_path)
     H_in, W_in, C_in = rgb_matrix.shape
     num_filters, F_h, F_w, _ = filters.shape
 
@@ -58,9 +48,3 @@ def conv_forward(rgb_matrix, filters, biases, stride=1,padding=1):
     Z=np.maximum(0,Z)   
     return Z
 
-if __name__ == "__main__":
-    ppm_path = "Shivansh_A_aug_1.ppm"
-    rgb_matrix = extract_rgb_matrix(ppm_path)
-    filters,biases= initialize_conv_layer(32,3,3)
-    Z=conv_forward(rgb_matrix,filters,biases)
-    print(Z.shape)
