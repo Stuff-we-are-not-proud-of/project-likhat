@@ -1,4 +1,4 @@
-from PIL import Image
+'''from PIL import Image
 import numpy as np
 def extract_rgb_matrix(ppm_path):
     img = Image.open(ppm_path).convert('RGB')
@@ -11,4 +11,15 @@ def extract_rgb_matrix(ppm_path):
     if img_array.shape != (100, 100, 3):
         raise ValueError(f"Unexpected shape {img_array.shape}.")
     
-    return img_array
+    return img_array'''
+
+from PIL import Image
+import numpy as np
+
+def extract_rgb_matrix(image_path):
+
+    img = Image.open(image_path)
+    
+    rgb_matrix = np.array(img)
+
+    return rgb_matrix

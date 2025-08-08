@@ -16,4 +16,10 @@ def max_pooling(feature_map, size=2, stride=2):
                 region = feature_map[h_start:h_end, w_start:w_end, c]
                 if region.size > 0:
                     pooled[i, j, c] = np.max(region)
-    return pooled
+    cache = {
+        "input": feature_map,
+        "size": size,
+        "stride": stride,
+        "pooled_shape": pooled.shape
+    }
+    return pooled, cache
