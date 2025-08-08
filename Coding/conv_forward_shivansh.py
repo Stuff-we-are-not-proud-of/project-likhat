@@ -48,3 +48,45 @@ def conv_forward(image_path, filters, biases, stride=1,padding=1):
     Z=np.maximum(0,Z)   
     return Z
 
+def conv_forward_from_matrix(input_matrix, filters, biases, stride=1, padding=0):
+    """
+    Perform convolution directly on a feature map (matrix) instead of an image path.
+    
+    input_matrix: np.array of shape (H_in, W_in, C_in)
+    filters: np.array of shape (num_filters, F_h, F_w, C_in)
+    biases: np.array of shape (num_filters,)
+    stride: int, default 1
+    padding: int, default 0
+
+    Returns: np.array of shape (H_out, W_out, num_filters)
+    """
+    H_in, W_in, C_in = input_matrix.shape
+    num_filters, F_h, F_w, _ = filters.shape
+
+    # Pad input if needed
+    if padding > 0:
+        input_matrix = np.pad(
+            input_matrix,
+            ((padding, padding), (padding, padding), (0, 0)),
+            mode='constant',
+            constant_values=0
+        )
+
+    # Output dimensions
+    H_out = (H_in + 2*padding - F_h) // stride + 1
+    W_out = (W_in + 2*padding - F_w) // stride + 1
+    Z = np.zeros((H_out, W_out, num_filters))
+
+    # Perform convolution
+    for f in range(num_filters):
+        filt = filters[f]
+        bias = biases[f]
+        for i in range(0, H_out):
+            for j in range(0, W_out):
+                region = input_matrix[i*stride:i*stride+F_h, j*stride:j*stride+F_w, :]
+                if region.shape == filt.shape:
+                    Z[i, j, f] = np.sum(region * filt) + bias
+    
+    # Apply ReLU
+    Z = np.maximum(0, Z)
+    return Z

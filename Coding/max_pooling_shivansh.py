@@ -1,5 +1,4 @@
 import numpy as np
-
 def max_pooling(feature_map, size=2, stride=2):
     H_in, W_in, C = feature_map.shape
     H_out = (H_in - size) // stride + 1
@@ -10,10 +9,11 @@ def max_pooling(feature_map, size=2, stride=2):
         for i in range(H_out):
             for j in range(W_out):
                 h_start = i * stride
-                h_end = h_start + size
+                h_end = min(h_start + size, H_in)
                 w_start = j * stride
-                w_end = w_start + size
+                w_end = min(w_start + size, W_in)
 
-                pooled[i, j, c] = np.max(feature_map[h_start:h_end, w_start:w_end, c])
-    
+                region = feature_map[h_start:h_end, w_start:w_end, c]
+                if region.size > 0:
+                    pooled[i, j, c] = np.max(region)
     return pooled
