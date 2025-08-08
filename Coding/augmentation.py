@@ -3,8 +3,8 @@ from PIL import Image
 import numpy as np
 import albumentations as A
 
-SRC_DIR = "../MajorDatasets/ResizedDataset"
-OUT_DIR = "../MajorDatasets/AugmentedDataset"
+SRC_DIR = "MajorDatasets/ResizedDataset"
+OUT_DIR = "MajorDatasets/AugmentedDataset"
 os.makedirs(OUT_DIR, exist_ok=True)
 
 albumentation_pipeline = A.Compose([
@@ -23,8 +23,7 @@ albumentation_pipeline = A.Compose([
     ),
 ])
 
-def augment_image(image, num_augments=5):       #augmenting
-    image = image.convert("L")
+def augment_image(image, num_augments=5):
     np_img = np.array(image)
 
     np_img_rgb = np.stack([np_img]*3, axis=-1)
@@ -47,7 +46,7 @@ for root, _, files in os.walk(SRC_DIR):
         src_path = os.path.join(root, filename)
 
         try:
-            image = Image.open(src_path).convert("L")
+            image = Image.open(src_path)
         except Exception as e:
             print(f"❌ Failed to open {filename}: {e}")
             continue

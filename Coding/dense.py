@@ -1,7 +1,7 @@
 import numpy as np
 
 def densen(input_array, output_size, activation="ReLU"):
-    input_size = input_array.shape[0]
+    input_size = len(input_array)
     limit = np.sqrt(6 / input_size)
     weights = np.random.uniform(-limit, limit, size=(input_size, output_size))
     biases = np.zeros(output_size)

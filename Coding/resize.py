@@ -4,7 +4,6 @@ def resize_to_100x100(input_path, output_path, target_size=(100, 100), format='P
     try:
         img = Image.open(input_path)
         img = img.convert('RGB')
-        img = img.convert('L') 
         orig_width, orig_height = img.size
         max_dim = max(orig_width, orig_height)
         padded_img = Image.new('L', (max_dim, max_dim), color=255) 
