@@ -20,6 +20,7 @@ def single_convolution_layer(image_path, filter_size=(3, 3), stride=1, num_filte
     output_height = ((input_height + 2*padding - filter_size[0]) // stride) + 1
     output_width = ((input_width + 2*padding - filter_size[1]) // stride) + 1
     output_matrix = np.zeros((output_height, output_width, num_filters))
+    Z = np.zeros((output_height, output_width, num_filters))  # Pre-activation for cache
     
     for i in range(output_height):
         for j in range(output_width):
@@ -27,10 +28,23 @@ def single_convolution_layer(image_path, filter_size=(3, 3), stride=1, num_filte
             broadcasted_subarray = subarray[np.newaxis, :, :, :]
             multiplied = filters * broadcasted_subarray
             conv_sum = np.sum(multiplied, axis=(1,2,3))
-            output = np.maximum(0, conv_sum + biases)
+            z = conv_sum + biases
+            Z[i, j, :] = z
+            output = np.maximum(0, z)
             output_matrix[i, j, :] = output
     
-    return output_matrix 
+    cache = {
+        "input": image_matrix,
+        "padded_input": padded_image,
+        "Z": Z,
+        "A": output_matrix,
+        "filters": filters,
+        "biases": biases,
+        "stride": stride,
+        "padding": padding
+    }
+    
+    return output_matrix, cache
 
 def single_convolution_layer_from_matrix(image_matrix, filter_size=(3, 3), stride=1, num_filters=32, padding=1):
     input_channels = image_matrix.shape[2]
@@ -40,6 +54,7 @@ def single_convolution_layer_from_matrix(image_matrix, filter_size=(3, 3), strid
     output_height = ((input_height + 2*padding - filter_size[0]) // stride) + 1
     output_width = ((input_width + 2*padding - filter_size[1]) // stride) + 1
     output_matrix = np.zeros((output_height, output_width, num_filters))
+    Z = np.zeros((output_height, output_width, num_filters))  # Pre-activation for cache
     
     for i in range(output_height):
         for j in range(output_width):
@@ -47,7 +62,20 @@ def single_convolution_layer_from_matrix(image_matrix, filter_size=(3, 3), strid
             broadcasted_subarray = subarray[np.newaxis, :, :, :]
             multiplied = filters * broadcasted_subarray
             conv_sum = np.sum(multiplied, axis=(1,2,3))
-            output = np.maximum(0, conv_sum + biases)
+            z = conv_sum + biases
+            Z[i, j, :] = z
+            output = np.maximum(0, z)
             output_matrix[i, j, :] = output
     
-    return output_matrix 
+    cache = {
+        "input": image_matrix,
+        "padded_input": padded_image,
+        "Z": Z,
+        "A": output_matrix,
+        "filters": filters,
+        "biases": biases,
+        "stride": stride,
+        "padding": padding
+    }
+    
+    return output_matrix, cache
