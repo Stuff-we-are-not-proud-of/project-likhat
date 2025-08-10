@@ -1,13 +1,8 @@
 import numpy as np
-from single_convolution_krishna import single_convolution_layer, single_convolution_layer_from_matrix
-from max_pooling_krishna import max_pool
-from flatten import flatten
-from dropout import dropout
-from dense import densen
-from backward_prop_layers import dense_backward, dropout_backward, flatten_backward
-from backward_propagation import binary_crossentropy_gradient, binary_crossentropy_loss
-from conv_backward_krishna import conv_backward
-from maxpool_backward_krishna import maxpool_backward
+from single_convolution_krishna import single_convolution_layer, single_convolution_layer_from_matrix, conv_backward
+from max_pooling_krishna import max_pool, maxpool_backward
+from forward_prop_layers import flatten, densen, dropout
+from backward_prop_layers import dense_backward, dropout_backward, flatten_backward, binary_crossentropy_gradient
 
 image_path = r"D:\Project\Coding\not_B_1.ppm"
 caches = []
