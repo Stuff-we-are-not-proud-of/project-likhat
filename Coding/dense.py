@@ -7,11 +7,18 @@ def densen(input_array, output_size, activation="ReLU"):
     biases = np.zeros(output_size)
 
     multiplied_matrix = input_array @ weights
-    added_to_multiplied = multiplied_matrix + biases
-    output = added_to_multiplied
-    if(activation == "ReLU"):
+    z = multiplied_matrix + biases  # Renamed added_to_multiplied to z for pre-activation
+    output = z.copy()  # Copy z to apply activation without modifying z
+    if activation == "ReLU":
         output = np.maximum(0, output)
-    elif(activation == "sigmoid"):
+    elif activation == "sigmoid":
         output = 1 / (1 + np.exp(-output))
     
-    return output
+    cache = {
+        'Z': z,
+        'A': output,
+        'weights': weights,
+        'biases': biases,
+        'input': input_array
+    }
+    return output, cache

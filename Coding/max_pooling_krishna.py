@@ -16,4 +16,10 @@ def max_pool(image_matrix, size=(2, 2), stride=2):
                     output_matrix[i, j, k] = np.max(sub)
                 else:
                     print(f"Warning: Empty subarray at ({i}, {j}, {k})")
-    return output_matrix
+    
+    cache = {
+        'input': image_matrix,
+        'size': size,
+        'stride': stride
+    }
+    return output_matrix, cache
