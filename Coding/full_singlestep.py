@@ -1,4 +1,3 @@
-import numpy as np
 from single_convolution_krishna import single_convolution_layer, single_convolution_layer_from_matrix, conv_backward
 from max_pooling_krishna import max_pool, maxpool_backward
 from forward_prop_layers import flatten, densen, dropout
