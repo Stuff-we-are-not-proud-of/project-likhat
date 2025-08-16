@@ -12,18 +12,17 @@ def batch_forward(batch_paths, conv1_filters, conv1_biases, conv2_filters, conv2
     outputs = []
     batch_caches = []
     for path in batch_paths:
-        singly_convolved, cache1 = single_convolution_layer(path, filter_size=(3, 3), stride=1, num_filters=32, padding=1, filters=conv1_filters, biases=conv1_biases)
+        singly_convolved, cache1 = single_convolution_layer(path, filter_size=(3, 3), stride=1, num_filters=8, padding=1, filters=conv1_filters, biases=conv1_biases)
         singly_maxxed, cache_max1 = max_pool(singly_convolved, size=(2, 2), stride=2)
-        doubly_convolved, cache2 = single_convolution_layer_from_matrix(singly_maxxed, filter_size=(3, 3), stride=1, num_filters=64, padding=1, filters=conv2_filters, biases=conv2_biases)
+        doubly_convolved, cache2 = single_convolution_layer_from_matrix(singly_maxxed, filter_size=(3, 3), stride=1, num_filters=16, padding=1, filters=conv2_filters, biases=conv2_biases)
         doubly_maxxed, cache_max2 = max_pool(doubly_convolved, size=(2, 2), stride=2)
-        triply_convolved, cache3 = single_convolution_layer_from_matrix(doubly_maxxed, filter_size=(3, 3), stride=1, num_filters=128, padding=1, filters=conv3_filters, biases=conv3_biases)
+        triply_convolved, cache3 = single_convolution_layer_from_matrix(doubly_maxxed, filter_size=(3, 3), stride=1, num_filters=32, padding=1, filters=conv3_filters, biases=conv3_biases)
         triply_maxxed, cache_max3 = max_pool(triply_convolved, size=(2, 2), stride=2)
         flattened, flatten_cache = flatten(triply_maxxed)
         dense1, densen_cache = densen(flattened, 128, activation="ReLU", W=dense1_W, b=dense1_b)
         dropped, dropout_cache = dropout(dense1, dropout_rate=0.5, training=True)
         output, densen_cache_1 = densen(dropped, 1, activation="sigmoid", W=dense2_W, b=dense2_b)
         outputs.append(output)
-        print(f"Sample pred: {output}")
         batch_caches.append([cache1, cache_max1, cache2, cache_max2, cache3, cache_max3, flatten_cache, densen_cache, dropout_cache, densen_cache_1])
     return outputs, batch_caches
 
@@ -108,7 +107,7 @@ def load_dataset(model_folder):
     
     return paths, labels
 
-learning_rate = 0.001
+learning_rate = 0.0001
 epochs = 5
 batch_size = 8
 model_folder = r"C:\Users\Krishna Gera\Desktop\Project Likhat\MajorDatasets\MiniModelVariant\Model1"
@@ -119,11 +118,11 @@ num_samples = len(paths)
 print(f"[{datetime.now()}] Loaded {num_samples} images (162 A + 162 NotA)")
 
 init_path = paths[0]
-singly_convolved, cache1 = single_convolution_layer(init_path, filter_size=(3, 3), stride=1, num_filters=32, padding=1)
+singly_convolved, cache1 = single_convolution_layer(init_path, filter_size=(3, 3), stride=1, num_filters=8, padding=1)
 singly_maxxed, cache_max1 = max_pool(singly_convolved, size=(2, 2), stride=2)
-doubly_convolved, cache2 = single_convolution_layer_from_matrix(singly_maxxed, filter_size=(3, 3), stride=1, num_filters=64, padding=1)
+doubly_convolved, cache2 = single_convolution_layer_from_matrix(singly_maxxed, filter_size=(3, 3), stride=1, num_filters=16, padding=1)
 doubly_maxxed, cache_max2 = max_pool(doubly_convolved, size=(2, 2), stride=2)
-triply_convolved, cache3 = single_convolution_layer_from_matrix(doubly_maxxed, filter_size=(3, 3), stride=1, num_filters=128, padding=1)
+triply_convolved, cache3 = single_convolution_layer_from_matrix(doubly_maxxed, filter_size=(3, 3), stride=1, num_filters=32, padding=1)
 triply_maxxed, cache_max3 = max_pool(triply_convolved, size=(2, 2), stride=2)
 flattened, flatten_cache = flatten(triply_maxxed)
 dense1, densen_cache = densen(flattened, 128, activation="ReLU")
@@ -184,7 +183,6 @@ for epoch in tqdm(range(epochs), desc="Epochs"):
         dense1_b -= learning_rate * gradients['dense1_db']
         dense2_W -= learning_rate * gradients['dense2_dW']
         dense2_b -= learning_rate * gradients['dense2_db']
-        print(np.mean(gradients['dense2_dW']))
         
         batch_pbar.set_postfix({'Batch Loss': f'{loss:.4f}', 'Batch Acc': f'{accuracy:.4f}'})
     
