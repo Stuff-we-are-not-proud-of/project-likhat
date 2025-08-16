@@ -22,25 +22,27 @@ def flatten(input_matrix):
 
 import numpy as np
 
-def densen(input_array, output_size, activation="ReLU"):
+def densen(input_array, output_size, activation="ReLU", W=None, b=None):
     input_size = len(input_array)
-    limit = np.sqrt(6 / input_size)
-    weights = np.random.uniform(-limit, limit, size=(input_size, output_size))
-    biases = np.zeros(output_size)
+    if W is None or b is None:
+        limit = np.sqrt(6 / input_size)
+        W = np.random.uniform(-limit, limit, size=(input_size, output_size))
+        b = np.zeros(output_size)
 
-    multiplied_matrix = input_array @ weights
-    z = multiplied_matrix + biases
+    multiplied_matrix = input_array @ W
+    z = multiplied_matrix + b
     output = z.copy()
     if activation == "ReLU":
         output = np.maximum(0, output)
     elif activation == "sigmoid":
-        output = 1 / (1 + np.exp(-output))
+        z = np.clip(z, -500, 500)
+        output = 1 / (1 + np.exp(-z))
     
     cache = {
         'Z': z,
         'A': output,
-        'weights': weights,
-        'biases': biases,
+        'weights': W,
+        'biases': b,
         'input': input_array
     }
     return output, cache
