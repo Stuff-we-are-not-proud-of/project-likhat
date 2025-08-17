@@ -17,9 +17,6 @@ from PIL import Image
 import numpy as np
 
 def extract_rgb_matrix(image_path):
-
-    img = Image.open(image_path)
-    
-    rgb_matrix = np.array(img)
-
+    img = Image.open(image_path).convert("RGB")
+    rgb_matrix = np.array(img, dtype=np.float32) / 255.0  # scale 0–1
     return rgb_matrix
