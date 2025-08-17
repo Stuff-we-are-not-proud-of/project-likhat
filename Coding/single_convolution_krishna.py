@@ -11,10 +11,11 @@ def generate_filters(filter_size, input_channels, num_filters=32):
 def padding_image(image_matrix, pad):
     return np.pad(image_matrix, ((pad, pad), (pad, pad), (0, 0)), mode='constant', constant_values=0)
 
-def single_convolution_layer(image_path, filter_size=(3, 3), stride=1, num_filters=32, padding=1):
-    image_matrix = ppm_to_matrix(image_path)
+def single_convolution_layer(image_path, filter_size=(3, 3), stride=1, num_filters=32, padding=1, filters=None, biases=None):
+    image_matrix = ppm_to_matrix(image_path) / 255.0
     input_channels = image_matrix.shape[2]
-    filters, biases = generate_filters(filter_size, input_channels, num_filters)
+    if filters is None or biases is None:
+        filters, biases = generate_filters(filter_size, input_channels, num_filters)
     padded_image = padding_image(image_matrix, pad=padding)
     input_height, input_width, _ = image_matrix.shape  # Unpadded size for output calculation
     output_height = ((input_height + 2*padding - filter_size[0]) // stride) + 1
@@ -46,9 +47,10 @@ def single_convolution_layer(image_path, filter_size=(3, 3), stride=1, num_filte
     
     return output_matrix, cache
 
-def single_convolution_layer_from_matrix(image_matrix, filter_size=(3, 3), stride=1, num_filters=32, padding=1):
+def single_convolution_layer_from_matrix(image_matrix, filter_size=(3, 3), stride=1, num_filters=32, padding=1, filters=None, biases=None):
     input_channels = image_matrix.shape[2]
-    filters, biases = generate_filters(filter_size, input_channels, num_filters)
+    if filters is None or biases is None:
+        filters, biases = generate_filters(filter_size, input_channels, num_filters)
     padded_image = padding_image(image_matrix, pad=padding)
     input_height, input_width, _ = image_matrix.shape  # Unpadded
     output_height = ((input_height + 2*padding - filter_size[0]) // stride) + 1
